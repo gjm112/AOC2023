@@ -27,7 +27,7 @@ findrow <- function(r, seed){
 
 mapping <- function(xseed, data = from_to[[1]]){
   #Find the correct row
-  therow <- apply(data,1,find, seed = xseed)
+  therow <- apply(data,1,findrow, seed = xseed)
   #find the map.  
   if (sum(therow)==0){out <- xseed }
   if (sum(therow)>0){out <- data[therow,"dest"] + xseed - data[therow,"source"]}
@@ -41,12 +41,52 @@ temp <- mapping(seed, from_to[[1]])
 for (i in 2:7){
 temp <- mapping(temp, from_to[[i]])
 }
+print(temp)
 return(temp)
 }
+
 
 library(tidyverse)
 map(seeds,soil_to_loc) %>% unlist() %>% min()
 
+#Part 2 brute force
+soil_to_loc <- function(seed){
+  temp <- mapping(seed, from_to[[1]])
+  for (i in 2:7){
+    temp <- mapping(temp, from_to[[i]])
+  }
+  
+  return(c(seed,temp))
+}
+
+seeds <- c(4043382508, 113348245, 3817519559 ,177922221 ,3613573568 ,7600537 ,773371046, 400582097 ,2054637767 ,162982133 ,2246524522, 153824596 ,1662955672, 121419555, 2473628355, 846370595, 1830497666 ,190544464, 230006436, 483872831)
+library(tidyverse)
+seedsdf <- data.frame(seedstart = seeds[seq(1,20,2)], seedrange = seeds[seq(1,19,2) + 1]) %>% mutate(seedend = seedstart + seedrange - 1)
+dat <- seedsdf[,c(1,3)]
+
+lll <- list()
+for (i in 1:nrow(dat)){print(i)
+check <- seq(dat[i,1],dat[i,2],100000)
+ lll[[i]] <- do.call(rbind,map(check,soil_to_loc))
+}
+results <- as.data.frame(do.call(rbind,lll))
+names(results) <- c("in","out")
+results %>% arrange(out) %>% head(10)
+
+
+#Try numbers near 920771046 
+lll <- list()
+i <- 1
+center <-   920707466 
+  check <- seq(center-1000,center+1000,1)
+  lll[[i]] <- do.call(rbind,map(check,soil_to_loc))
+
+results <- as.data.frame(do.call(rbind,lll))
+names(results) <- c("in","out")
+results %>% arrange(out) %>% head(10)
+
+#Lowest: 60568894
+60568880
 
 
 
@@ -55,8 +95,49 @@ map(seeds,soil_to_loc) %>% unlist() %>% min()
 
 
 
-#Part 2
+
+
+#Part 2 Attempt 2
+library(tidyverse)
+for (i in 1:7){
+  from_to[[i]] <- from_to[[i]] %>% mutate(sourceend = source + range - 1,
+                                          destend = dest + range - 1)
+}
+
+library(tidyverse)
+seedsdf <- data.frame(seedstart = seeds[seq(1,20,2)], seedrange = seeds[seq(1,19,2) + 1]) %>% mutate(seedend = seedstart + seedrange - 1)
+
+
+#Check if they don't over lap and take the opposite.  
+input <- list(seedsdf[1,c(1,3)])
+
+
 from_to[[1]] %>% arrange(source)
+
+#takes in input intervals and returns output intervals
+function(input, map = from_to[[1]]){
+  
+  rows <- apply(map,1,function(x){!((input[[1]][1] > x["sourceend"]) | (input[[1]][2] < x["source"]))})
+  #four cases of overlap 
+  
+  input[[1]]["seedstart"]
+  map[rows,][1]
+  
+  
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 #One row of the mapping and one row of the sourcerange
 findrows2check <- function(r, sourcerange){

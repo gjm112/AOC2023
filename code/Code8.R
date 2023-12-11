@@ -17,13 +17,28 @@ nexttt <- function(loc,i){
 count <- 0
 loc <- "AAA"
 i <- 1
+locvec <- c()
 while (loc != "ZZZ"){
   loc <- nexttt(loc,i)
   count <- count + 1
   if (i < 269){i <- i + 1} else {i <- 1}
-  print(loc)
-  
+  locvec[count] <- loc
 }
+locvec[16409:(16409:10)]
+#Post checks
+count <- 0
+loc <- "AAA"
+i <- 1
+locvec <- c()
+for (q in 1:20000){
+  loc <- nexttt(loc,i)
+  count <- count + 1
+  if (i < 269){i <- i + 1} else {i <- 1}
+  locvec[count] <- loc
+}
+locvec[16409:(16409+10)]
+
+print(count)
 
 QXA, AAA, PDA, TDA, QQA, PPA, 
 c(12643, 16409, 14257, 15871, 18023, 19637)/269
@@ -74,4 +89,5 @@ while (any(substring(loc,3,3) != "Z")){
 }
 count
 
+directions
 
